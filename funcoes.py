@@ -38,7 +38,10 @@ class LocalizacaoAutomatica:
         return f"{self.estado}"
     def obter_pais(self):
         return f"{self.estado}"
-
+    def obter_lat(self):
+        return f"{self.lat}"
+    def obter_lon(self):
+        return f"{self.lon}"
     
     
 class WeatherDataCollector:
@@ -85,7 +88,7 @@ class WeeklyForecastDataFetcher:
             weekly_forecast = [
                 {
                     "date": datetime.fromisoformat(forecast['dt_txt']),
-                    "temperature": round(forecast['main']['temp'] - 273.15),  # Convertendo para Celsius e arredondando
+                    "temperature": round(forecast['main']['temp'] - 273.15),  
                     "conditions": forecast['weather'][0]['description']
                 }
                 for forecast in daily_forecasts

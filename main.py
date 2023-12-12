@@ -2,6 +2,10 @@ import requests
 import geocoder
 from tkinter import *
 
+import tkinter as tk
+import webbrowser
+import folium
+
 from funcoes import LocalizacaoAutomatica, WeatherDataCollector, WeeklyForecastDataFetcher, WeeklyForecast
 
 def obter_localizacao_automatica():
@@ -17,20 +21,6 @@ def obter_localizacao_automatica():
         #print(f'Cidade: {cidade}, Estado: {estado}, País: {pais}')
     else:
         print('Não foi possível obter a localização automaticamente.')
-'''
-def exibir_previsao_semanal():
-    weekly_forecast_instance.update_forecast()
-    previsao_text = ""
-
-    if weekly_forecast_instance.weekly_forecast:
-        previsao_text += "Previsão Semanal:\n"
-        for day in weekly_forecast_instance.weekly_forecast:
-            previsao_text += f"{day['date']}: Temperatura: {day['temperature']}°C, Condições: {day['conditions']}\n"
-    else:
-        previsao_text = "Falha ao obter a previsão semanal."
-
-    previsao_label.config(text=previsao_text)
-'''
 
 if __name__ == "__main__":
     obter_localizacao_automatica()
@@ -39,6 +29,8 @@ if __name__ == "__main__":
     resultado = localizacao_obj.obter_localizacao()
     city_usuario = localizacao_obj.cidade
     country_usuario = localizacao_obj.pais
+    lat_usuario= localizacao_obj.lat
+    lon_usuario= localizacao_obj.lon
 
     print(resultado)
 
@@ -61,20 +53,26 @@ if __name__ == "__main__":
     weekly_forecast_instance.update_forecast()
     weekly_forecast_instance.display_forecast()
 
-    
 
 
-'''
-    janela = Tk()
-    janela.title("Olha a chuvaaaaaaa")
+url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat_usuario}&lon={lon_usuario}&appid={api_key}"
 
-    # Adicione um botão para exibir a previsão
-    botao_previsao = Button(janela, text="Exibir Previsão Semanal", command=exibir_previsao_semanal)
-    botao_previsao.pack()
+# Crie um mapa centrado na localização
+mapa = folium.Map(location=[lat_usuario, lon_usuario], zoom_start=10)
 
-    # Adicione um rótulo para exibir a previsão
-    previsao_label = Label(janela, text="")
-    previsao_label.pack()
+popup_text = f"Localização: ({lat_usuario}, {lon_usuario})\nTemperatura: {city_data['temperature']}°C"
+folium.Marker([lat_usuario, lon_usuario], popup=popup_text).add_to(mapa)
 
-    janela.mainloop()
-'''
+# salvando o mapa em um arquivo HTML temporário
+mapa.save("temp_mapa_meteorologico.html")
+
+# abrir o mapa em um navegador externo
+def abrir_mapa():
+    webbrowser.open("temp_mapa_meteorologico.html", new=2)
+
+
+root = tk.Tk()
+root.title("Mapa Meteorológico")
+abrir_mapa_button = tk.Button(root, text="Abrir Mapa", command=abrir_mapa)
+abrir_mapa_button.pack(pady=10)
+root.mainloop()
